@@ -39,6 +39,13 @@ class Settings(BaseSettings):
     trading_enabled: bool = Field(False, env="TRADING_ENABLED")
     risk_limit: float = Field(1000.0, env="RISK_LIMIT")
     max_position_size: float = Field(0.1, env="MAX_POSITION_SIZE")
+
+    # Email Notification Configuration (163 Email)
+    email_enabled: bool = Field(False, env="EMAIL_ENABLED")
+    email_sender: Optional[str] = Field(None, env="EMAIL_SENDER")
+    email_password: Optional[str] = Field(None, env="EMAIL_PASSWORD")
+    email_sender_name: Optional[str] = Field(None, env="EMAIL_SENDER_NAME")
+    email_use_ssl: bool = Field(True, env="EMAIL_USE_SSL")
     
     class Config:
         env_file = ".env"

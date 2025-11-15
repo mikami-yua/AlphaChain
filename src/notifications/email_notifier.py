@@ -31,50 +31,65 @@ def create_email_notifier_from_config(config) -> Optional['EmailNotifier']:
         return None
 
     sender_name = getattr(config, 'email_sender_name', None)
+    smtp_server = getattr(config, 'email_smtp_server', None)
+    smtp_port = getattr(config, 'email_smtp_port', None)
     use_ssl = getattr(config, 'email_use_ssl', True)
-
+    
     return EmailNotifier(
         sender_email=sender,
         sender_password=password,
         sender_name=sender_name,
+        smtp_server=smtp_server,
+        smtp_port=smtp_port,
         use_ssl=use_ssl
     )
 
 
 class EmailNotifier:
     """
-    Email notification service using 163 SMTP server
+    Email notification service using SMTP server
     
     This module provides a simple interface for sending emails
-    through 163 email service. It supports both plain text and HTML emails.
+    through SMTP servers. It supports multiple email providers
+    (163, Gmail, QQ, etc.) and both plain text and HTML emails.
     """
 
-    # 163 SMTP server configuration
-    SMTP_SERVER = "smtp.163.com"
-    SMTP_PORT = 465  # SSL port
-    SMTP_PORT_ALT = 25  # Alternative non-SSL port
-
+    # Default SMTP server configurations (for backward compatibility)
+    DEFAULT_SMTP_SERVER = "smtp.163.com"
+    DEFAULT_SMTP_PORT = 465  # SSL port
+    DEFAULT_SMTP_PORT_ALT = 25  # Alternative non-SSL port
+    
     def __init__(
             self,
             sender_email: str,
             sender_password: str,
             sender_name: Optional[str] = None,
+            smtp_server: Optional[str] = None,
+            smtp_port: Optional[int] = None,
             use_ssl: bool = True
     ):
         """
         Initialize email notifier
         
         Args:
-            sender_email: 163 email address (e.g., 'yourname@163.com')
-            sender_password: Email password or authorization code (for 163, use authorization code)
+            sender_email: Email address (e.g., 'yourname@163.com', 'yourname@gmail.com')
+            sender_password: Email password or authorization code
             sender_name: Display name for sender (optional)
+            smtp_server: SMTP server address (default: smtp.163.com)
+            smtp_port: SMTP server port (default: 465 for SSL, 25 for non-SSL)
             use_ssl: Whether to use SSL connection (default: True)
         """
         self.sender_email = sender_email
         self.sender_password = sender_password
         self.sender_name = sender_name or sender_email.split('@')[0]
+        self.smtp_server = smtp_server or self.DEFAULT_SMTP_SERVER
         self.use_ssl = use_ssl
-        self.smtp_port = self.SMTP_PORT if use_ssl else self.SMTP_PORT_ALT
+
+        # Set port based on SSL and provided value
+        if smtp_port is not None:
+            self.smtp_port = smtp_port
+        else:
+            self.smtp_port = self.DEFAULT_SMTP_PORT if use_ssl else self.DEFAULT_SMTP_PORT_ALT
 
     def _create_message(
             self,
@@ -149,9 +164,9 @@ class EmailNotifier:
 
             # Connect to SMTP server and send
             if self.use_ssl:
-                server = smtplib.SMTP_SSL(self.SMTP_SERVER, self.smtp_port)
+                server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port)
             else:
-                server = smtplib.SMTP(self.SMTP_SERVER, self.smtp_port)
+                server = smtplib.SMTP(self.smtp_server, self.smtp_port)
                 server.starttls()
 
             server.login(self.sender_email, self.sender_password)

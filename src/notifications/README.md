@@ -18,11 +18,21 @@
 ```python
 from src.notifications import EmailNotifier
 
-# 创建邮件通知器实例
+# 创建邮件通知器实例（使用默认163配置）
 notifier = EmailNotifier(
     sender_email="your_email@163.com",
-    sender_password="your_authorization_code",  # 163邮箱需要使用授权码
+    sender_password="your_authorization_code",
     sender_name="AlphaChain Bot",
+    use_ssl=True
+)
+
+# 或者指定自定义SMTP服务器（如Gmail）
+notifier = EmailNotifier(
+    sender_email="your_email@gmail.com",
+    sender_password="your_app_password",
+    sender_name="AlphaChain Bot",
+    smtp_server="smtp.gmail.com",
+    smtp_port=465,
     use_ssl=True
 )
 
@@ -84,10 +94,16 @@ else:
 # 启用邮件通知
 EMAIL_ENABLED=true
 
-# 163邮箱地址
+# SMTP服务器地址（支持163、Gmail、QQ等）
+EMAIL_SMTP_SERVER=smtp.163.com
+
+# SMTP服务器端口（通常465为SSL，587为TLS，25为非加密）
+EMAIL_SMTP_PORT=465
+
+# 发件人邮箱地址
 EMAIL_SENDER=your_email@163.com
 
-# 163邮箱授权码（不是登录密码）
+# 邮箱密码或授权码（163邮箱需要使用授权码）
 EMAIL_PASSWORD=your_authorization_code
 
 # 发件人显示名称（可选）
@@ -95,6 +111,46 @@ EMAIL_SENDER_NAME=AlphaChain Bot
 
 # 是否使用SSL连接（默认true）
 EMAIL_USE_SSL=true
+```
+
+### 常用邮件服务商配置
+
+#### 163邮箱
+
+```env
+EMAIL_SMTP_SERVER=smtp.163.com
+EMAIL_SMTP_PORT=465
+EMAIL_USE_SSL=true
+```
+
+#### Gmail
+
+```env
+EMAIL_SMTP_SERVER=smtp.gmail.com
+EMAIL_SMTP_PORT=465
+EMAIL_USE_SSL=true
+# 或者使用TLS
+EMAIL_SMTP_PORT=587
+EMAIL_USE_SSL=false
+```
+
+#### QQ邮箱
+
+```env
+EMAIL_SMTP_SERVER=smtp.qq.com
+EMAIL_SMTP_PORT=465
+EMAIL_USE_SSL=true
+# 或者使用TLS
+EMAIL_SMTP_PORT=587
+EMAIL_USE_SSL=false
+```
+
+#### Outlook/Hotmail
+
+```env
+EMAIL_SMTP_SERVER=smtp-mail.outlook.com
+EMAIL_SMTP_PORT=587
+EMAIL_USE_SSL=false
 ```
 
 ## 163邮箱授权码获取
